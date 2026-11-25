@@ -1,0 +1,111 @@
+
+import ollama
+
+from search import search_documents
+
+
+CHAT_MODEL = "llama3.2:latest"
+
+
+def answer_question(question, top_k=2):
+
+    if not question.strip():
+        raise ValueError("Question cannot be empty.")
+
+    # Retrieve relevant document chunks
+    results = search_documents(question, top_k)
+
+    if results is None:
+        return None
+
+    documents = results["documents"][0]
+    metadatas = results["metadatas"][0]
+    distances = results["distances"][0]
+
+    if not documents:
+        return None
+
+    # Build the context using retrieved documents
+    context_parts = []
+
+    sources = []
+
+    for document, metadata, distance in zip(
+        documents, metadatas, distances
+    ):
+
+        source_info = (
+            f"Source: {metadata['source']}, "
+            f"Chunk: {metadata['chunk_index']}"
+        )
+
+        context_parts.append(
+            f"[{source_info}]\n{document}"
+        )
+
+        sources.append({
+            "source": metadata["source"],
+            "chunk": metadata["chunk_index"],
+            "distance": distance
+        })
+
+    context = "\n\n".join(context_parts)
+
+    # Ask the AI to generate an answer
+    response = ollama.chat(
+        model=CHAT_MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a helpful assistant. "
+                    "Answer questions using the supplied "
+                    "retrieved context. If the context does "
+                    "not contain enough information, say so."
+                )
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Retrieved context:\n\n{context}\n\n"
+                    f"Question: {question}\n\n"
+                    "Provide a clear and concise answer."
+                )
+            }
+        ]
+    )
+
+    answer = response["message"]["content"]
+
+    return answer, sources
+
+
+def main():
+
+    print("\n========== BLINDSPOT AI ASSISTANT ==========\n")
+
+    question = input("Ask a question: ").strip()
+
+    result = answer_question(question)
+
+    if result is None:
+        print("\nNo relevant information available.")
+        return
+
+    answer, sources = result
+
+    print("\n========== AI RESPONSE ==========\n")
+    print(answer)
+
+    print("\n========== SOURCES USED ==========\n")
+
+    for source in sources:
+        print(
+            f"{source['source']} | "
+            f"Chunk {source['chunk']} | "
+            f"Distance: {source['distance']:.4f}"
+        )
+
+
+if __name__ == "__main__":
+    main()

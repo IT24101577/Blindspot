@@ -1,0 +1,16 @@
+
+Cybersecurity Fundamentals
+
+Prompt injection is an attack against applications that use Large Language Models (LLMs).
+
+It occurs when malicious or untrusted instructions influence the behavior of an AI model.
+
+Direct prompt injection comes from instructions supplied directly by a user.
+
+Indirect prompt injection occurs when malicious instructions are hidden inside external content, such as documents, websites or retrieved information.
+
+Retrieval-Augmented Generation (RAG) is a technique that allows an AI application to retrieve relevant information from an external knowledge source before generating a response.
+
+However, retrieved information is not automatically trustworthy. An application must treat external documents as untrusted input and implement appropriate security controls.
+
+Security controls may include access restrictions, input validation, output validation and careful handling of retrieved content.
