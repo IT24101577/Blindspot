@@ -4,309 +4,852 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blindspot | Security Workspace</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/dashboard.css') }}">
+    <title>Blindspot | Knowledge Workbench</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', path='/css/dashboard.css') }}">
 </head>
 
 <body>
-    <div class="app-layout">
 
-        <!-- Sidebar -->
-        <aside class="sidebar">
+<div class="workbench-shell">
 
-            <div class="brand">
-                <div class="brand-icon">B</div>
+    <!-- LEFT: KNOWLEDGE SOURCES -->
+    <aside class="source-rail">
+
+        <div class="brand">
+            <div class="brand-mark">B</div>
+
+            <div class="brand-copy">
+                <strong>BLINDSPOT</strong>
+                <span>AI SECURITY WORKBENCH</span>
+            </div>
+        </div>
+
+        <div class="workspace-label">
+            <span class="section-kicker">WORKSPACE</span>
+            <span class="local-indicator">
+                <span class="status-dot"></span>
+                LOCAL
+            </span>
+        </div>
+
+        <section class="source-section">
+
+            <div class="section-heading">
                 <div>
-                    <h2>BLINDSPOT</h2>
-                    <span>AI SECURITY LAB</span>
+                    <p class="section-kicker">KNOWLEDGE BASE</p>
+                    <h2>Sources</h2>
                 </div>
+
+                <span class="count-badge">{{ stats.document_count }}</span>
             </div>
 
-            <div class="nav-section">
-                <p class="nav-heading">WORKSPACE</p>
+            <div class="source-search">
+                <span class="search-symbol">⌕</span>
 
-                <a href="/" class="nav-item active">
-                    <span>◈</span> Overview
-                </a>
-
-                <a href="#" class="nav-item disabled">
-                    <span>▤</span> Knowledge Base
-                    <small>SOON</small>
-                </a>
-
-                <a href="#" class="nav-item disabled">
-                    <span>◉</span> AI Playground
-                    <small>SOON</small>
-                </a>
-
-                <p class="nav-heading second-heading">SECURITY</p>
-
-                <a href="#" class="nav-item disabled">
-                    <span>⌁</span> Security Testing
-                    <small>SOON</small>
-                </a>
-
-                <a href="#" class="nav-item disabled">
-                    <span>▧</span> Test Reports
-                    <small>SOON</small>
-                </a>
+                <input
+                    type="search"
+                    id="source-filter"
+                    placeholder="Find a document..."
+                    aria-label="Filter documents"
+                >
             </div>
 
-            <div class="sidebar-bottom">
-                <div class="local-indicator">
-                    <span class="status-dot"></span>
-                    <div>
-                        <strong>LOCAL INSTANCE</strong>
-                        <p>Running on your machine</p>
-                    </div>
-                </div>
+            <div class="source-list" id="source-list">
 
-                <p class="version">BLINDSPOT v0.1.0</p>
-            </div>
+                {% if documents %}
 
-        </aside>
+                    {% for document in documents %}
 
+                        <div class="source-item"
+                             data-source-name="{{ document|lower }}">
 
-        <!-- Main Content -->
-        <main class="main-content">
+                            <div class="file-icon">TXT</div>
 
-            <header class="topbar">
-                <div class="breadcrumb">
-                    Workspace <span>/</span> Overview
-                </div>
+                            <div class="source-details">
+                                <strong title="{{ document }}">
+                                    {{ document }}
+                                </strong>
 
-                <div class="topbar-right">
-                    <span class="local-badge">● LOCAL ENVIRONMENT</span>
-                    <div class="avatar">D</div>
-                </div>
-            </header>
-
-
-            <section class="page-content">
-
-                <div class="page-heading">
-                    <div>
-                        <p class="eyebrow">SECURITY WORKSPACE</p>
-                        <h1>Overview</h1>
-                        <p class="subtitle">
-                            Monitor your AI application and its security environment.
-                        </p>
-                    </div>
-
-                    <div class="system-status">
-                        <span class="status-dot"></span>
-                        SYSTEM OPERATIONAL
-                    </div>
-                </div>
-
-
-                <!-- Statistics -->
-                <section class="stats-grid">
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>DOCUMENTS INDEXED</span>
-                            <span class="stat-icon">▤</span>
-                        </div>
-
-                        <h2>{{ stats.document_count }}</h2>
-                        <p>Unique source documents</p>
-                    </div>
-
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>KNOWLEDGE CHUNKS</span>
-                            <span class="stat-icon">▦</span>
-                        </div>
-
-                        <h2>{{ stats.chunk_count }}</h2>
-                        <p>Stored vector records</p>
-                    </div>
-
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>AI MODELS</span>
-                            <span class="stat-icon">✳</span>
-                        </div>
-
-                        <h2>02</h2>
-                        <p>Llama 3.2 + Qwen3</p>
-                    </div>
-
-
-                    <div class="stat-card">
-                        <div class="stat-top">
-                            <span>VECTOR DATABASE</span>
-                            <span class="stat-icon">◫</span>
-                        </div>
-
-                        <h2 class="database-status">{{ stats.db_status }}</h2>
-                        <p>Persistent local storage</p>
-                    </div>
-
-                </section>
-
-
-                <!-- Main Grid -->
-                <section class="content-grid">
-
-                    <div class="panel">
-                        <div class="panel-heading">
-                            <div>
-                                <h3>System Overview</h3>
-                                <p>Core components of Blindspot</p>
-                            </div>
-
-                            <span class="live-label">LIVE STATUS</span>
-                        </div>
-
-
-                        <div class="component-list">
-
-                            <div class="component">
-                                <div class="component-icon">AI</div>
-
-                                <div class="component-info">
-                                    <strong>LLM Engine</strong>
-                                    <p>Ollama · Llama 3.2</p>
-                                </div>
-
-                                <span class="configured">CONFIGURED</span>
-                            </div>
-
-
-                            <div class="component">
-                                <div class="component-icon">EM</div>
-
-                                <div class="component-info">
-                                    <strong>Embedding Engine</strong>
-                                    <p>Qwen3 · 0.6B</p>
-                                </div>
-
-                                <span class="configured">CONFIGURED</span>
-                            </div>
-
-
-                            <div class="component">
-                                <div class="component-icon">DB</div>
-
-                                <div class="component-info">
-                                    <strong>Vector Database</strong>
-                                    <p>ChromaDB · Persistent</p>
-                                </div>
-
-                                <span class="component-status">
-                                    {{ stats.db_status.upper() }}
+                                <span>
+                                    <span class="status-dot"></span>
+                                    Indexed
                                 </span>
                             </div>
 
-
-                            <div class="component">
-                                <div class="component-icon">API</div>
-
-                                <div class="component-info">
-                                    <strong>Application Backend</strong>
-                                    <p>FastAPI · Python</p>
-                                </div>
-
-                                <span class="configured">OPERATIONAL</span>
-                            </div>
-
                         </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="source-empty">
+                        No indexed documents yet.
                     </div>
 
+                {% endif %}
 
-                    <div class="panel focus-panel">
-                        <div class="panel-heading">
-                            <div>
-                                <h3>Development Focus</h3>
-                                <p>Current project milestone</p>
-                            </div>
-                        </div>
+                <div class="source-empty hidden" id="no-search-results">
+                    No matching documents.
+                </div>
 
-                        <div class="focus-icon">⌘</div>
+            </div>
 
-                        <p class="focus-label">CURRENT PHASE</p>
-                        <h2>Interface Development</h2>
+        </section>
 
-                        <p class="focus-description">
-                            Building the web interface for document management,
-                            AI interaction and security testing.
-                        </p>
+        <!-- UPLOAD -->
+        <section class="source-upload">
 
-                        <div class="progress-track">
-                            <div class="progress-fill"></div>
-                        </div>
+            <p class="section-kicker">DOCUMENT INGESTION</p>
 
-                        <div class="progress-info">
-                            <span>RAG foundation completed</span>
-                            <strong>Next: Web UI</strong>
-                        </div>
+            <form
+                action="/documents/upload"
+                method="post"
+                enctype="multipart/form-data"
+                class="upload-form"
+            >
+
+                <label class="file-picker">
+                    <span>+</span>
+                    <span>Choose TXT document</span>
+
+                    <input
+                        type="file"
+                        name="file"
+                        accept=".txt,text/plain"
+                        required
+                    >
+                </label>
+
+                <button type="submit" class="upload-button">
+                    Upload and index
+                </button>
+
+            </form>
+
+            {% if upload_message %}
+
+                <div class="upload-notice {% if upload_error %}error{% else %}success{% endif %}">
+                    {{ upload_message }}
+                </div>
+
+            {% endif %}
+
+            <p class="upload-description">
+                Accepted format: TXT · Maximum size: 2 MB
+            </p>
+
+        </section>
+
+        <div class="source-rail-footer">
+
+            <div class="environment-detail">
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>LOCAL INSTANCE</strong>
+                    <span>Running on this machine</span>
+                </div>
+            </div>
+
+            <div class="version-row">
+                <span>BLINDSPOT</span>
+                <span>v0.1.0</span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN WORKSPACE -->
+    <main class="main-workspace">
+
+        <!-- HEADER -->
+        <header class="workspace-header">
+
+            <div class="breadcrumb">
+                <span>WORKSPACE</span>
+                <span class="breadcrumb-separator">/</span>
+                <strong>AI PLAYGROUND</strong>
+            </div>
+
+            <div class="header-status">
+
+                <span class="header-metric">
+                    <strong>{{ stats.document_count }}</strong>
+                    Sources
+                </span>
+
+                <span class="header-divider"></span>
+
+                <span class="header-metric">
+                    <strong>{{ stats.chunk_count }}</strong>
+                    Chunks
+                </span>
+
+                <span class="header-divider"></span>
+
+                <span class="database-indicator">
+                    <span class="status-dot"></span>
+                    ChromaDB {{ stats.db_status }}
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- WORKSPACE CONTENT -->
+        <div class="workspace-content">
+
+            <section class="workspace-intro">
+
+                <div>
+                    <p class="section-kicker">DOCUMENT INTELLIGENCE</p>
+
+                    <h1>Query workspace</h1>
+
+                    <p>
+                        Ask questions about your indexed documents.
+                        Inspect the information used to generate each response.
+                    </p>
+                </div>
+
+                <div class="model-information">
+
+                    <div class="model-detail">
+                        <span>GENERATION</span>
+                        <strong>Ollama / Llama 3.2</strong>
                     </div>
 
-                </section>
-
-
-                <!-- Documents -->
-                <section class="panel documents-panel">
-
-                    <div class="panel-heading">
-                        <div>
-                            <h3>Knowledge Base</h3>
-                            <p>Documents currently indexed in Blindspot</p>
-                        </div>
-
-                        <span class="coming-soon">UPLOAD FEATURE · COMING SOON</span>
+                    <div class="model-detail">
+                        <span>EMBEDDINGS</span>
+                        <strong>Qwen3 / 0.6B</strong>
                     </div>
 
-
-                    {% if documents %}
-
-                        <div class="document-list">
-
-                            {% for document in documents %}
-
-                                <div class="document-item">
-                                    <div class="document-icon">TXT</div>
-
-                                    <div class="document-info">
-                                        <strong>{{ document }}</strong>
-                                        <p>Indexed in local vector database</p>
-                                    </div>
-
-                                    <span class="indexed-status">
-                                        <span class="status-dot"></span>
-                                        INDEXED
-                                    </span>
-                                </div>
-
-                            {% endfor %}
-
-                        </div>
-
-                    {% else %}
-
-                        <div class="empty-state">
-                            No documents have been indexed yet.
-                        </div>
-
-                    {% endif %}
-
-                </section>
-
-
-                <footer class="footer">
-                    <span>BLINDSPOT © 2026</span>
-                    <span>AI APPLICATION SECURITY TESTING LABORATORY</span>
-                </footer>
+                </div>
 
             </section>
 
-        </main>
 
-    </div>
+            <!-- THREE-PART WORKSPACE -->
+            <section class="workbench-grid">
+
+
+                <!-- CENTER: QUERY AND ANSWERS -->
+                <section class="conversation-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h2>Conversation</h2>
+                            <p>Document-grounded question answering</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="text-button"
+                            id="clear-session"
+                        >
+                            Clear conversation
+                        </button>
+
+                    </div>
+
+
+                    <!-- CHAT HISTORY -->
+                    <div
+                        class="chat-stream"
+                        id="chat-messages"
+                        aria-live="polite"
+                        aria-label="Conversation"
+                    >
+
+                        <div class="welcome-state" id="welcome-state">
+
+                            <div class="welcome-mark">B</div>
+
+                            <p class="section-kicker">
+                                BLINDSPOT QUERY ENGINE
+                            </p>
+
+                            <h3>What would you like to investigate?</h3>
+
+                            <p>
+                                Submit a question to search your knowledge
+                                base and generate an answer using retrieved
+                                document passages.
+                            </p>
+
+                            <div class="welcome-details">
+
+                                <span>
+                                    <span class="status-dot"></span>
+                                    {{ stats.document_count }} indexed sources
+                                </span>
+
+                                <span>
+                                    {{ stats.chunk_count }} vector records
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- QUESTION COMPOSER -->
+                    <form class="query-composer" id="playground-form">
+
+                        <div class="composer-label">
+                            <span>NEW QUERY</span>
+                            <span>LOCAL KNOWLEDGE BASE</span>
+                        </div>
+
+                        <textarea
+                            id="question-input"
+                            placeholder="Ask a question about your indexed documents..."
+                            rows="3"
+                            maxlength="2000"
+                            required
+                            aria-label="Your question"
+                        ></textarea>
+
+                        <div class="composer-footer">
+
+                            <span class="composer-hint">
+                                <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
+                                to submit
+                            </span>
+
+                            <button
+                                type="submit"
+                                class="run-button"
+                                id="ask-button"
+                            >
+                                Run query
+                                <span>↗</span>
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+
+                <!-- RIGHT: RETRIEVAL INSPECTOR -->
+                <aside class="inspector-panel">
+
+                    <div class="panel-header inspector-header">
+
+                        <div>
+                            <p class="section-kicker">QUERY ANALYSIS</p>
+                            <h2>Retrieval trace</h2>
+                        </div>
+
+                        <span class="inspector-icon">⌁</span>
+
+                    </div>
+
+
+                    <div class="inspector-summary">
+
+                        <div>
+                            <span class="summary-label">RETRIEVED PASSAGES</span>
+                            <strong id="retrieved-count">—</strong>
+                        </div>
+
+                        <div>
+                            <span class="summary-label">SEARCH TYPE</span>
+                            <strong>Vector search</strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="retrieved-section">
+
+                        <div class="retrieved-heading">
+                            <span>RETRIEVED SOURCES</span>
+                            <span id="retrieval-status">AWAITING QUERY</span>
+                        </div>
+
+                        <div
+                            class="retrieved-list"
+                            id="retrieved-sources"
+                        >
+
+                            <div class="inspector-empty">
+                                <span class="empty-symbol">⌕</span>
+
+                                <strong>No retrieval data</strong>
+
+                                <p>
+                                    Retrieved document passages and
+                                    similarity distances will appear here
+                                    after a query.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="retrieval-method">
+
+                        <p class="section-kicker">RETRIEVAL CONFIGURATION</p>
+
+                        <div class="config-row">
+                            <span>Search method</span>
+                            <strong>Semantic vector</strong>
+                        </div>
+
+                        <div class="config-row">
+                            <span>Distance metric</span>
+                            <strong>Cosine</strong>
+                        </div>
+
+                        <div class="config-row">
+                            <span>Maximum distance</span>
+                            <strong>0.40</strong>
+                        </div>
+
+                        <div class="config-row">
+                            <span>Maximum results</span>
+                            <strong>5</strong>
+                        </div>
+
+                        <p class="config-note">
+                            Current backend configuration. These values
+                            are displayed for reference; they are not
+                            editable from this panel.
+                        </p>
+
+                    </div>
+
+                </aside>
+
+            </section>
+
+
+            <footer class="workspace-footer">
+                <span>BLINDSPOT · LOCAL AI SECURITY WORKBENCH</span>
+                <span>DOCUMENT-GROUNDED RETRIEVAL</span>
+            </footer>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+// ============================================
+// ELEMENT REFERENCES
+// ============================================
+
+const form = document.getElementById("playground-form");
+const questionInput = document.getElementById("question-input");
+const chatMessages = document.getElementById("chat-messages");
+const askButton = document.getElementById("ask-button");
+
+const retrievedSources = document.getElementById("retrieved-sources");
+const retrievedCount = document.getElementById("retrieved-count");
+const retrievalStatus = document.getElementById("retrieval-status");
+
+const welcomeState = document.getElementById("welcome-state");
+
+
+// ============================================
+// CHAT MESSAGE DISPLAY
+// ============================================
+
+function addMessage(role, message) {
+
+    const wrapper = document.createElement("article");
+    wrapper.className = `message ${role}`;
+
+    const messageHeader = document.createElement("div");
+    messageHeader.className = "message-header";
+
+    const roleLabel = document.createElement("span");
+
+    roleLabel.textContent =
+        role === "user" ? "YOU" :
+        role === "error" ? "REQUEST ERROR" :
+        "BLINDSPOT";
+
+    messageHeader.appendChild(roleLabel);
+
+    const content = document.createElement("div");
+    content.className = "message-content";
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = message;
+
+    content.appendChild(paragraph);
+
+    wrapper.appendChild(messageHeader);
+    wrapper.appendChild(content);
+
+    chatMessages.appendChild(wrapper);
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    return wrapper;
+}
+
+
+// ============================================
+// RETRIEVAL INSPECTOR
+// ============================================
+
+function renderInspector(sources) {
+
+    retrievedSources.replaceChildren();
+
+    if (!Array.isArray(sources) || sources.length === 0) {
+
+        retrievedCount.textContent = "0";
+        retrievalStatus.textContent = "NO MATCHES";
+
+        const empty = document.createElement("div");
+        empty.className = "inspector-empty";
+
+        const title = document.createElement("strong");
+        title.textContent = "No relevant passages";
+
+        const description = document.createElement("p");
+        description.textContent =
+            "No document chunks passed the current relevance filter.";
+
+        empty.appendChild(title);
+        empty.appendChild(description);
+
+        retrievedSources.appendChild(empty);
+
+        return;
+    }
+
+    retrievedCount.textContent = String(sources.length);
+    retrievalStatus.textContent = "COMPLETED";
+
+    sources.forEach((source, index) => {
+
+        const card = document.createElement("article");
+        card.className = "retrieved-card";
+
+        const cardTop = document.createElement("div");
+        cardTop.className = "retrieved-card-top";
+
+        const rank = document.createElement("span");
+        rank.className = "result-rank";
+        rank.textContent = `#${index + 1}`;
+
+        const distance = document.createElement("span");
+        distance.className = "distance-value";
+
+        const numericDistance = Number(source.distance);
+
+        distance.textContent = Number.isFinite(numericDistance)
+            ? numericDistance.toFixed(4)
+            : "N/A";
+
+        cardTop.appendChild(rank);
+        cardTop.appendChild(distance);
+
+
+        const fileName = document.createElement("strong");
+        fileName.className = "retrieved-filename";
+        fileName.textContent = source.source;
+
+
+        const metadata = document.createElement("div");
+        metadata.className = "retrieved-metadata";
+
+        const chunk = document.createElement("span");
+        chunk.textContent = `Chunk ${source.chunk}`;
+
+        const metric = document.createElement("span");
+        metric.textContent = "Cosine distance";
+
+        metadata.appendChild(chunk);
+        metadata.appendChild(metric);
+
+
+        card.appendChild(cardTop);
+        card.appendChild(fileName);
+        card.appendChild(metadata);
+
+        retrievedSources.appendChild(card);
+
+    });
+
+}
+
+
+// ============================================
+// SOURCES ATTACHED TO AI ANSWERS
+// ============================================
+
+function displaySources(messageElement, sources) {
+
+    const container = document.createElement("div");
+    container.className = "message-sources";
+
+    const heading = document.createElement("span");
+    heading.className = "message-sources-heading";
+    heading.textContent = "SOURCE REFERENCES";
+
+    container.appendChild(heading);
+
+    if (!Array.isArray(sources) || sources.length === 0) {
+
+        const note = document.createElement("p");
+        note.textContent =
+            "No relevant document sources were retrieved.";
+
+        container.appendChild(note);
+
+    } else {
+
+        sources.forEach((source, index) => {
+
+            const item = document.createElement("div");
+            item.className = "message-source-item";
+
+            const reference = document.createElement("span");
+            reference.className = "source-reference-number";
+            reference.textContent = `[${index + 1}]`;
+
+            const description = document.createElement("span");
+
+            const distance = Number(source.distance);
+            const distanceText = Number.isFinite(distance)
+                ? distance.toFixed(4)
+                : "N/A";
+
+            description.textContent =
+                `${source.source} · Chunk ${source.chunk} · Distance ${distanceText}`;
+
+            item.appendChild(reference);
+            item.appendChild(description);
+
+            container.appendChild(item);
+
+        });
+
+    }
+
+    messageElement.appendChild(container);
+
+}
+
+
+// ============================================
+// QUERY SUBMISSION
+// ============================================
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const question = questionInput.value.trim();
+
+    if (!question || askButton.disabled) {
+        return;
+    }
+
+    // Remove the welcome state
+    if (welcomeState) {
+        welcomeState.remove();
+    }
+
+    // Display user question
+    addMessage("user", question);
+
+    questionInput.value = "";
+
+    // Update interface while the request is processing
+    askButton.disabled = true;
+    askButton.textContent = "Processing...";
+
+    retrievalStatus.textContent = "SEARCHING";
+    retrievedCount.textContent = "—";
+
+    const loadingMessage = addMessage(
+        "loading",
+        "Searching indexed documents and generating a response..."
+    );
+
+    renderInspector(null);
+
+    try {
+
+        // Existing FastAPI endpoint
+        const response = await fetch("/api/ask", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                question: question
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "The AI request failed."
+            );
+        }
+
+        // Remove processing message
+        loadingMessage.remove();
+
+        // Display AI response
+        const answerMessage = addMessage(
+            "assistant",
+            data.answer
+        );
+
+        // Attach source references
+        displaySources(answerMessage, data.sources);
+
+        // Populate actual retrieved source information
+        renderInspector(data.sources);
+
+    } catch (error) {
+
+        loadingMessage.remove();
+
+        addMessage(
+            "error",
+            `Unable to process the request: ${error.message}`
+        );
+
+        renderInspector([]);
+
+        retrievalStatus.textContent = "REQUEST FAILED";
+
+    } finally {
+
+        askButton.disabled = false;
+        askButton.innerHTML = 'Run query <span>↗</span>';
+
+        questionInput.focus();
+
+    }
+
+});
+
+
+// ============================================
+// KEYBOARD SHORTCUT
+// ============================================
+
+questionInput.addEventListener("keydown", function(event) {
+
+    if (
+        event.key === "Enter" &&
+        (event.ctrlKey || event.metaKey)
+    ) {
+
+        event.preventDefault();
+        form.requestSubmit();
+
+    }
+
+});
+
+
+// ============================================
+// SOURCE SEARCH
+// ============================================
+
+const sourceFilter = document.getElementById("source-filter");
+const sourceItems = document.querySelectorAll(".source-item");
+const noSearchResults = document.getElementById("no-search-results");
+
+sourceFilter.addEventListener("input", function() {
+
+    const query = sourceFilter.value.trim().toLowerCase();
+
+    let visibleCount = 0;
+
+    sourceItems.forEach(item => {
+
+        const matches = item.dataset.sourceName.includes(query);
+
+        item.hidden = !matches;
+
+        if (matches) {
+            visibleCount++;
+        }
+
+    });
+
+    noSearchResults.classList.toggle(
+        "hidden",
+        visibleCount !== 0 || query === ""
+    );
+
+});
+
+
+// ============================================
+// CLEAR CONVERSATION
+// ============================================
+
+document.getElementById("clear-session").addEventListener(
+    "click",
+    function() {
+
+        chatMessages.replaceChildren();
+
+        const welcome = document.createElement("div");
+        welcome.className = "welcome-state";
+        welcome.id = "welcome-state";
+
+        const mark = document.createElement("div");
+        mark.className = "welcome-mark";
+        mark.textContent = "B";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "What would you like to investigate?";
+
+        const description = document.createElement("p");
+        description.textContent =
+            "Submit a question to search your knowledge base and inspect retrieved passages.";
+
+        welcome.appendChild(mark);
+        welcome.appendChild(heading);
+        welcome.appendChild(description);
+
+        chatMessages.appendChild(welcome);
+
+        renderInspector(null);
+
+        retrievedCount.textContent = "—";
+        retrievalStatus.textContent = "AWAITING QUERY";
+
+    }
+);
+
+</script>
+
 </body>
 </html>
