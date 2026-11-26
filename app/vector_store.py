@@ -3,9 +3,9 @@ from pathlib import Path
 
 import chromadb
 
-from document_loader import load_text_documents, SAMPLES_DIR
-from chunker import chunk_text
-from embedder import generate_embeddings
+from app.document_loader import load_text_documents, SAMPLES_DIR
+from app.chunker import chunk_text
+from app.embedder import generate_embeddings
 
 
 # Database configuration
@@ -14,10 +14,10 @@ DB_PATH = Path(__file__).resolve().parent.parent / "chroma_db"
 COLLECTION_NAME = "blindspot_knowledge"
 
 
-def store_documents():
-
+def store_documents(directory=SAMPLES_DIR):
+    
     # Load our documents
-    documents = load_text_documents(SAMPLES_DIR)
+    documents = load_text_documents(directory)
 
     if not documents:
         print("No documents found.")
@@ -75,6 +75,41 @@ def store_documents():
         documents=all_chunks,
         metadatas=all_metadata
     )
+        # Remove outdated chunks from previous indexing versions
+    for document in documents:
+
+        source = document["source"]
+
+        # Generate the IDs expected from the current chunker
+        expected_ids = {
+            f"{source}_chunk_{index}"
+            for index, _ in enumerate(
+                chunk_text(document["text"]),
+                start=1
+            )
+        }
+
+        # Retrieve existing records for this document
+        existing_records = collection.get(
+            where={"source": source},
+            include=["metadatas"]
+        )
+
+        # Identify chunks that no longer exist
+        stale_ids = [
+            record_id
+            for record_id in existing_records["ids"]
+            if record_id not in expected_ids
+        ]
+
+        # Delete obsolete chunks
+        if stale_ids:
+            collection.delete(ids=stale_ids)
+
+            print(
+                f"Removed {len(stale_ids)} outdated chunks "
+                f"from {source}"
+            )
 
     print("\nDocuments stored successfully!")
     print(f"Collection: {COLLECTION_NAME}")
@@ -85,3 +120,4 @@ def store_documents():
 
 if __name__ == "__main__":
     store_documents()
+ 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import chromadb
 
-from embedder import generate_embeddings
+from app.embedder import generate_embeddings
 
 
 # Database configuration
@@ -12,10 +12,17 @@ DB_PATH = Path(__file__).resolve().parent.parent / "chroma_db"
 COLLECTION_NAME = "blindspot_knowledge"
 
 
-def search_documents(question, top_k=2):
+
+def search_documents(question, top_k=5, max_distance=0.40):
 
     if not question.strip():
         raise ValueError("Search question cannot be empty.")
+
+    if top_k <= 0:
+        raise ValueError("top_k must be positive.")
+
+    if not 0 <= max_distance <= 2:
+        raise ValueError("Invalid cosine distance threshold.")
 
     # Connect to our persistent database
     client = chromadb.PersistentClient(
@@ -33,10 +40,10 @@ def search_documents(question, top_k=2):
         print("The database is empty.")
         return None
 
-    # Convert the user's question into an embedding
+    # Convert the question into an embedding
     query_embedding = generate_embeddings([question])[0]
 
-    # Search for the closest matching document chunks
+    # Retrieve the closest document chunks
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=min(top_k, total_records),
@@ -47,7 +54,30 @@ def search_documents(question, top_k=2):
         ]
     )
 
+    # Identify chunks that meet the relevance threshold
+    distances = results["distances"][0]
+
+    relevant_indices = [
+        index
+        for index, distance in enumerate(distances)
+        if distance <= max_distance
+    ]
+
+    # Return nothing when no relevant chunks are found
+    if not relevant_indices:
+        print("No sufficiently relevant information found.")
+        return None
+
+    # Keep only relevant search results
+    for field in ("ids", "documents", "metadatas", "distances"):
+
+        results[field][0] = [
+            results[field][0][index]
+            for index in relevant_indices
+        ]
+
     return results
+
 
 
 def main():

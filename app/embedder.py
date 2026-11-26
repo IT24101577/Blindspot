@@ -1,8 +1,8 @@
 
 import ollama
 
-from chunker import chunk_text
-from document_loader import load_text_documents, SAMPLES_DIR
+from app.chunker import chunk_text
+from app.document_loader import load_text_documents, SAMPLES_DIR
 
 
 EMBEDDING_MODEL = "qwen3-embedding:0.6b"
