@@ -1,4 +1,4 @@
-
+import hashlib
 from pathlib import Path
 import re
 import uuid
@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 from app.vector_store import store_documents
 from pydantic import BaseModel
 from app.ask import answer_question
+from app.document_loader import SAMPLES_DIR
 
 # Project paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -108,7 +109,9 @@ async def home(
         "invalid_type": "Only TXT files are currently supported.",
         "too_large": "File exceeds the 2 MB upload limit.",
         "invalid_text": "The file must contain valid, non-empty UTF-8 text.",
-        "processing_failed": "Document processing failed. Check the server logs."
+        "processing_failed": "Document processing failed. Check the server logs.",
+        "duplicate": "This document already exists in the knowledge base."
+        
     }
 
     return templates.TemplateResponse(
@@ -172,6 +175,51 @@ async def upload_document(file: UploadFile = File(...)):
             "/?upload_status=invalid_text",
             status_code=303
         )
+    
+    # Calculate SHA-256 hash of uploaded content
+    normalized_text = text.replace("\r\n", "\n").replace("\r", "\n")
+
+    content_hash = hashlib.sha256(
+        normalized_text.encode("utf-8")
+    ).hexdigest()
+
+
+    # Check existing documents for identical content
+    for directory in (SAMPLES_DIR, UPLOADS_DIR):
+
+        if not directory.exists():
+            continue
+
+        for existing_file in directory.glob("*.txt"):
+
+            try:
+                existing_text = existing_file.read_text(
+                    encoding="utf-8"
+                )
+            except (OSError, UnicodeDecodeError):
+                continue
+
+            existing_text = (
+                existing_text
+                .replace("\r\n", "\n")
+                .replace("\r", "\n")
+            )
+
+            existing_hash = hashlib.sha256(
+                existing_text.encode("utf-8")
+            ).hexdigest()
+
+            if content_hash == existing_hash:
+
+                print(
+                    f"Duplicate document detected: "
+                    f"{existing_file.name}"
+                )
+
+                return RedirectResponse(
+                    "/?upload_status=duplicate",
+                    status_code=303
+                )
 
     # Generate a safe, unique filename
     stem = Path(original_name).stem
