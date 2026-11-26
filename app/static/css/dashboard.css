@@ -2119,3 +2119,23 @@ kbd {
     background: rgba(0, 255, 65, 0.08);
     border-color: rgba(0, 255, 65, 0.25);
 }
+
+/* Document source selection */
+
+.source-item {
+    cursor: pointer;
+}
+
+.source-checkbox {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+
+    accent-color: #68745A;
+    cursor: pointer;
+}
+
+.source-checkbox:focus-visible {
+    outline: 2px solid #A84E35;
+    outline-offset: 3px;
+}

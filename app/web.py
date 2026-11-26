@@ -48,6 +48,7 @@ templates = Jinja2Templates(
 
 class AskRequest(BaseModel):
     question: str
+    sources: list[str] | None = None
 
 
 # Dashboard data
@@ -218,7 +219,10 @@ async def upload_document(file: UploadFile = File(...)):
 def ask_ai(payload: AskRequest):
 
     try:
-        result = answer_question(payload.question)
+        result = answer_question(
+            payload.question,
+            sources=payload.sources
+        )
 
         if result is None:
             return {

@@ -64,7 +64,15 @@
                     {% for document in documents %}
 
                         <div class="source-item"
-                             data-source-name="{{ document|lower }}">
+                            data-source-name="{{ document|lower }}">
+
+                            <input
+                                type="checkbox"
+                                class="source-checkbox"
+                                value="{{ document }}"
+                                checked
+                                aria-label="Include {{ document }} in searches"
+                            >
 
                             <div class="file-icon">TXT</div>
 
@@ -704,7 +712,10 @@ form.addEventListener("submit", async function(event) {
             },
 
             body: JSON.stringify({
-                question: question
+                question: question,
+                sources: Array.from(
+                    document.querySelectorAll(".source-checkbox:checked")
+                ).map(checkbox => checkbox.value)
             })
 
         });

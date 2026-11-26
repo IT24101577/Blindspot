@@ -10,13 +10,17 @@ from pydantic import BaseModel
 CHAT_MODEL = "llama3.2:latest"
 
 
-def answer_question(question, top_k=5):
+def answer_question(question, top_k=5, sources=None):
 
     if not question.strip():
         raise ValueError("Question cannot be empty.")
 
     # Retrieve relevant document chunks
-    results = search_documents(question, top_k)
+    results = search_documents(
+    question,
+    top_k,
+    sources=sources
+    )
 
     if results is None:
         return None

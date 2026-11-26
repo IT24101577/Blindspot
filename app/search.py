@@ -13,7 +13,8 @@ COLLECTION_NAME = "blindspot_knowledge"
 
 
 
-def search_documents(question, top_k=5, max_distance=0.40):
+
+def search_documents(question, top_k=5, max_distance=0.40, sources=None):
 
     if not question.strip():
         raise ValueError("Search question cannot be empty.")
@@ -24,37 +25,66 @@ def search_documents(question, top_k=5, max_distance=0.40):
     if not 0 <= max_distance <= 2:
         raise ValueError("Invalid cosine distance threshold.")
 
-    # Connect to our persistent database
     client = chromadb.PersistentClient(
         path=str(DB_PATH)
     )
 
-    # Access our existing collection
     collection = client.get_collection(
         name=COLLECTION_NAME
     )
 
-    total_records = collection.count()
+    # Restrict retrieval to selected documents
+    where = None
+
+    if sources is not None:
+
+        selected_sources = list(dict.fromkeys(
+            source.strip()
+            for source in sources
+            if isinstance(source, str) and source.strip()
+        ))
+
+        if not selected_sources:
+            return None
+
+        where = {
+            "source": {
+                "$in": selected_sources
+            }
+        }
+
+    if where is not None:
+        matching_records = collection.get(
+            where=where,
+            include=["metadatas"]
+        )
+
+        total_records = len(matching_records["ids"])
+
+    else:
+        total_records = collection.count()
 
     if total_records == 0:
-        print("The database is empty.")
         return None
 
-    # Convert the question into an embedding
     query_embedding = generate_embeddings([question])[0]
 
-    # Retrieve the closest document chunks
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=min(top_k, total_records),
-        include=[
+    query_options = {
+        "query_embeddings": [query_embedding],
+        "n_results": min(top_k, total_records),
+        "include": [
             "documents",
             "metadatas",
             "distances"
         ]
-    )
+    }
 
-    # Identify chunks that meet the relevance threshold
+    if where is not None:
+        query_options["where"] = where
+
+    results = collection.query(**query_options)
+
+    # Apply relevance filtering
     distances = results["distances"][0]
 
     relevant_indices = [
@@ -63,12 +93,9 @@ def search_documents(question, top_k=5, max_distance=0.40):
         if distance <= max_distance
     ]
 
-    # Return nothing when no relevant chunks are found
     if not relevant_indices:
-        print("No sufficiently relevant information found.")
         return None
 
-    # Keep only relevant search results
     for field in ("ids", "documents", "metadatas", "distances"):
 
         results[field][0] = [
