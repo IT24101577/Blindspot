@@ -2139,3 +2139,39 @@ kbd {
     outline: 2px solid #A84E35;
     outline-offset: 3px;
 }
+/* Retrieved passage inspection */
+
+.retrieved-excerpt {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+
+    margin-top: 11px;
+
+    color: #55594F;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+.retrieved-details {
+    margin-top: 9px;
+    padding-top: 8px;
+    border-top: 1px solid #DAD5C9;
+}
+
+.retrieved-details summary {
+    color: #A84E35;
+    font-size: 9px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.retrieved-details > p {
+    margin-top: 9px;
+
+    color: #55594F;
+    font-size: 10px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}

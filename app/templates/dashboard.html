@@ -593,9 +593,32 @@ function renderInspector(sources) {
         metadata.appendChild(metric);
 
 
+        // Display a preview of the retrieved passage
+        const passage = document.createElement("p");
+        passage.className = "retrieved-excerpt";
+        passage.textContent = source.content || "Passage content unavailable.";
+
+
+        // Allow the user to expand the full passage
+        const details = document.createElement("details");
+        details.className = "retrieved-details";
+
+        const summary = document.createElement("summary");
+        summary.textContent = "View full passage";
+
+        const fullContent = document.createElement("p");
+        fullContent.textContent = source.content || "Passage content unavailable.";
+
+        details.appendChild(summary);
+        details.appendChild(fullContent);
+
+
+        // Assemble the retrieval card
         card.appendChild(cardTop);
         card.appendChild(fileName);
         card.appendChild(metadata);
+        card.appendChild(passage);
+        card.appendChild(details);
 
         retrievedSources.appendChild(card);
 

@@ -53,7 +53,8 @@ def answer_question(question, top_k=5, sources=None):
         sources.append({
             "source": metadata["source"],
             "chunk": metadata["chunk_index"],
-            "distance": distance
+            "distance": float(distance),
+            "content": document
         })
 
     context = "\n\n".join(context_parts)
