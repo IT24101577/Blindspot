@@ -1,21 +1,23 @@
 
-from pathlib import Path
-
 import chromadb
 
 from app.embedder import generate_embeddings
+from app.vector_store import (
+    DB_PATH,
+    COLLECTION_NAME,
+    SECURITY_LAB_COLLECTION
+)
 
 
-# Database configuration
-DB_PATH = Path(__file__).resolve().parent.parent / "chroma_db"
-
-COLLECTION_NAME = "blindspot_knowledge"
 
 
-
-
-def search_documents(question, top_k=5, max_distance=0.40, sources=None):
-
+def search_documents(
+    question,
+    top_k=5,
+    max_distance=0.40,
+    sources=None,
+    collection_name=COLLECTION_NAME
+):
     if not question.strip():
         raise ValueError("Search question cannot be empty.")
 
@@ -25,12 +27,18 @@ def search_documents(question, top_k=5, max_distance=0.40, sources=None):
     if not 0 <= max_distance <= 2:
         raise ValueError("Invalid cosine distance threshold.")
 
+    if collection_name not in (
+        COLLECTION_NAME,
+        SECURITY_LAB_COLLECTION
+    ):
+        raise ValueError("Unsupported collection.")
+
     client = chromadb.PersistentClient(
         path=str(DB_PATH)
     )
 
     collection = client.get_collection(
-        name=COLLECTION_NAME
+        name=collection_name
     )
 
     # Restrict retrieval to selected documents

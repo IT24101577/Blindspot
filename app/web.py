@@ -10,7 +10,10 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.vector_store import store_documents
+from app.vector_store import (
+    store_documents,
+    SECURITY_LAB_COLLECTION
+)
 from pydantic import BaseModel
 from app.ask import answer_question
 from app.document_loader import SAMPLES_DIR
@@ -50,6 +53,10 @@ templates = Jinja2Templates(
 class AskRequest(BaseModel):
     question: str
     sources: list[str] | None = None
+
+class SecurityLabAskRequest(BaseModel):
+    question: str
+    source: str
 
 
 # Dashboard data
@@ -303,6 +310,59 @@ def ask_ai(payload: AskRequest):
         raise HTTPException(
             status_code=500,
             detail="AI request failed. Check the server logs."
+        )
+
+# Security Research Lab API
+@app.post("/api/security-lab/ask")
+def ask_security_lab(payload: SecurityLabAskRequest):
+
+    if not payload.source.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Source cannot be empty."
+        )
+
+    try:
+
+        result = answer_question(
+            payload.question,
+            sources=[payload.source],
+            collection_name=SECURITY_LAB_COLLECTION
+        )
+
+        if result is None:
+            return {
+                "answer": "No relevant information found in the security lab.",
+                "sources": []
+            }
+
+        answer, sources = result
+
+        return {
+            "answer": answer,
+            "sources": [
+                {
+                    **source,
+                    "distance": float(source["distance"])
+                }
+                for source in sources
+            ]
+        }
+
+    except ValueError as exc:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc)
+        )
+
+    except Exception as exc:
+
+        print(f"Security lab query error: {exc}")
+
+        raise HTTPException(
+            status_code=500,
+            detail="Security lab request failed. Check server logs."
         )
 
 

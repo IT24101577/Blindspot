@@ -2,6 +2,7 @@
 import ollama
 
 from app.search import search_documents
+from app.vector_store import COLLECTION_NAME
 
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
 from pydantic import BaseModel
@@ -10,16 +11,21 @@ from pydantic import BaseModel
 CHAT_MODEL = "llama3.2:latest"
 
 
-def answer_question(question, top_k=5, sources=None):
-
+def answer_question(
+    question,
+    top_k=5,
+    sources=None,
+    collection_name=COLLECTION_NAME
+):
     if not question.strip():
         raise ValueError("Question cannot be empty.")
 
     # Retrieve relevant document chunks
     results = search_documents(
-    question,
-    top_k,
-    sources=sources
+        question,
+        top_k,
+        sources=sources,
+        collection_name=collection_name
     )
 
     if results is None:
@@ -35,7 +41,7 @@ def answer_question(question, top_k=5, sources=None):
     # Build the context using retrieved documents
     context_parts = []
 
-    sources = []
+    retrieved_sources = []
 
     for document, metadata, distance in zip(
         documents, metadatas, distances
@@ -50,7 +56,7 @@ def answer_question(question, top_k=5, sources=None):
             f"[{source_info}]\n{document}"
         )
 
-        sources.append({
+        retrieved_sources.append({
             "source": metadata["source"],
             "chunk": metadata["chunk_index"],
             "distance": float(distance),
@@ -108,7 +114,7 @@ def answer_question(question, top_k=5, sources=None):
 
     answer = response["message"]["content"]
 
-    return answer, sources
+    return answer, retrieved_sources
 
 
 def main():

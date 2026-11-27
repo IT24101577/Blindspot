@@ -12,9 +12,13 @@ from app.embedder import generate_embeddings
 DB_PATH = Path(__file__).resolve().parent.parent / "chroma_db"
 
 COLLECTION_NAME = "blindspot_knowledge"
+SECURITY_LAB_COLLECTION = "blindspot_security_lab"
 
 
-def store_documents(directory=SAMPLES_DIR):
+def store_documents(
+    directory=SAMPLES_DIR,
+    collection_name=COLLECTION_NAME
+):
     
     # Load our documents
     documents = load_text_documents(directory)
@@ -63,7 +67,7 @@ def store_documents(directory=SAMPLES_DIR):
 
     # Create or retrieve our collection
     collection = client.get_or_create_collection(
-        name=COLLECTION_NAME,
+        name=collection_name,
         metadata={"hnsw:space": "cosine"},
         embedding_function=None
     )
@@ -112,7 +116,7 @@ def store_documents(directory=SAMPLES_DIR):
             )
 
     print("\nDocuments stored successfully!")
-    print(f"Collection: {COLLECTION_NAME}")
+    print(f"Collection: {collection_name}")
     print(f"Database location: {DB_PATH}")
     print(f"Chunks processed: {len(all_chunks)}")
     print(f"Total records in database: {collection.count()}")
